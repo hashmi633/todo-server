@@ -1,0 +1,1 @@
+1. to run server `poetry run uvicorn app.main:todo_server --reload`
