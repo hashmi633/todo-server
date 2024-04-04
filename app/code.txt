@@ -1,0 +1,70 @@
+from typing import Optional
+from fastapi import FastAPI, HTTPException
+from sqlmodel import SQLModel, Field, create_engine, Session
+from contextlib import asynccontextmanager
+from pydantic import BaseModel
+from app import settings
+
+
+# Database connection schema
+class Todo(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    content: str
+    is_complete: bool = Field(default=False)
+
+
+# Connection to the database
+connection_string: str = str(settings.DATABASE_URL).replace(
+    "postgresql", "postgresql+psycopg"
+)
+engine = create_engine(connection_string, echo=True)
+
+
+# Creation of table
+def create_db_table():
+    print("create_db_tables...")
+    SQLModel.metadata.create_all(engine)
+    print("Done !")
+
+
+@asynccontextmanager
+async def lifespan(server: FastAPI):
+    print("Server startup")
+    create_db_table()
+    yield
+
+
+todo_server: FastAPI = FastAPI(lifespan=lifespan, title="todo app")
+
+
+# insert data in table
+def insert_data_in_table(content: str):
+    with Session(engine) as session:
+        data: Todo = Todo(content=content)
+        # session: Session = Session(engine)
+        session.add(data)
+        session.commit()
+
+
+class user_data(BaseModel):
+    content: str = Field(nullable=False)
+    is_complete: bool = False
+
+
+@todo_server.post("/todo")
+def add_todo_route(user_todo: user_data):
+    if user_todo:
+        insert_data_in_table(user_todo.content)
+        return {"message": "Todo Add successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="No todo found")
+
+
+@todo_server.get("/")
+def hello():
+    return {"hello": "world"}
+
+
+@todo_server.get("/db")
+def db_var():
+    return {"DB": settings.DATABASE_URL, "Connection": connection_string}
