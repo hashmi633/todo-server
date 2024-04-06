@@ -80,11 +80,14 @@ def update_todo(
 ):
     selected_todo = select(Todo).where(Todo.id == todo_id)
     updated_todo = session.exec(selected_todo).first()
-    updated_todo.todo = todo.todo
-    session.add(updated_todo)
-    session.commit()
-    session.refresh(updated_todo)
-    return updated_todo
+    if updated_todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    else:
+        updated_todo.todo = todo.todo
+        session.add(updated_todo)
+        session.commit()
+        session.refresh(updated_todo)
+        return updated_todo
 
 
 @todo_app.delete("/todo/{todo_id}", response_model=Todo)
