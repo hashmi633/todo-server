@@ -18,7 +18,7 @@ connection_string: str = str(settings.DATABASE_URL).replace(
     "postgresql", "postgresql+psycopg"
 )
 engine = create_engine(
-    connection_string, connect_args={"sslmode": "require"}, pool_recycle=500
+    connection_string, connect_args={"sslmode": "require"}, pool_recycle=500, echo=True
 )
 
 
@@ -39,8 +39,8 @@ async def life_span(server: FastAPI):
 todo_app: FastAPI = FastAPI(
     lifespan=life_span,
     title="todo app",
-    version="0.0.1",
-    servers=[{"url": "http:/0.0.0.0:8000", "description": "Development Server"}],
+    # version="0.0.1",
+    # servers=[{"url": "http:/0.0.0.0:8000", "description": "Development Server"}],
 )
 
 
@@ -65,9 +65,35 @@ def get_todos(todo: Todo, session: Annotated[Session, Depends(get_session)]):
 
 
 @todo_app.get("/todo/", response_model=list[Todo])
-def raed_todos(session: Annotated[Session, Depends(get_session)]):
+def read_todos(session: Annotated[Session, Depends(get_session)]):
     todos = session.exec(select(Todo)).all()
     return todos
+
+
+# class TodoUpdate(BaseModel):
+#     todo: str
+
+
+@todo_app.put("/todo/{todo_id}", response_model=Todo)
+def update_todo(
+    todo_id: int, todo: Todo, session: Annotated[Session, Depends(get_session)]
+):
+    selected_todo = select(Todo).where(Todo.id == todo_id)
+    updated_todo = session.exec(selected_todo).first()
+    updated_todo.todo = todo.todo
+    session.add(updated_todo)
+    session.commit()
+    session.refresh(updated_todo)
+    return updated_todo
+
+
+@todo_app.delete("/todo/{todo_id}", response_model=Todo)
+def delete_todo(todo_id: int, session: Annotated[Session, Depends(get_session)]):
+    selected_todo = select(Todo).where(Todo.id == todo_id)
+    deleted_todo = session.exec(selected_todo).first()
+    session.delete(deleted_todo)
+    session.commit()
+    return deleted_todo
 
 
 @todo_app.get("/")
