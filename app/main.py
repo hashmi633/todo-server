@@ -39,8 +39,8 @@ async def life_span(server: FastAPI):
 todo_app: FastAPI = FastAPI(
     lifespan=life_span,
     title="todo app",
-    # version="0.0.1",
-    # servers=[{"url": "http:/0.0.0.0:8000", "description": "Development Server"}],
+    version="0.0.1",
+    servers=[{"url": "http:/0.0.0.0:8000", "description": "Development Server"}],
 )
 
 
@@ -107,3 +107,12 @@ def hello():
 @todo_app.get("/db")
 def db_url():
     return {"DB": settings.DATABASE_URL, "connection_string": connection_string}
+
+
+@todo_app.get("/item")
+def get_items(q: Annotated[str | None, Query(max_length=25)] = None):
+
+    items = {"items": "foobar"}
+    if q:
+        items.update({"q": q})
+    return items
