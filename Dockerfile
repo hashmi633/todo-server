@@ -25,11 +25,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install dependencies including development ones
 # RUN poetry install
 
-# Make port 8000 available to the world outside this container
-EXPOSE 8000
+# Make port 8080 available to the world outside this container
+EXPOSE 8080
 
 # Define environment variable
 ENV DATABASE_URL postgresql://CRM-DATABASE_owner:PjAbJ7SiYH4r@ep-bold-water-a2xc97cm-pooler.eu-central-1.aws.neon.tech/todo-server?sslmode=require
 
 # Run the app. CMD can be overridden when starting the container
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
