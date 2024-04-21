@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.11
+FROM python:3.9
 
 LABEL maintainer="hashmi633@gmail.com"
 # Set the working directory in the container
@@ -11,16 +11,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install poetry
+# RUN pip install poetry
 
 # Copy the current directory contents into the container at /code
 COPY . /code/
 
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Configuration to avoid creating virtual environments inside the Docker container
-RUN poetry config virtualenvs.create false
+# RUN poetry config virtualenvs.create false
 
 # Install dependencies including development ones
-RUN poetry install
+# RUN poetry install
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
