@@ -1,4 +1,4 @@
-from starlette.config import Config
+from starlette.config import Config  # config installed with fastapi
 from starlette.datastructures import Secret
 
 
