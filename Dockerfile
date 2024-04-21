@@ -32,4 +32,4 @@ EXPOSE 8080
 ENV DATABASE_URL postgresql://CRM-DATABASE_owner:PjAbJ7SiYH4r@ep-bold-water-a2xc97cm-pooler.eu-central-1.aws.neon.tech/todo-server?sslmode=require
 
 # Run the app. CMD can be overridden when starting the container
-CMD ["uvicorn", "app.main:todo_server", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "app.main:todo_app", "--host", "0.0.0.0", "--port", "8080"]
