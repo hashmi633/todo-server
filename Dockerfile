@@ -3,7 +3,7 @@ FROM python:3.9
 
 LABEL maintainer="hashmi633@gmail.com"
 # Set the working directory in the container
-WORKDIR /code
+WORKDIR /usr/src/app
 # Install system dependencies required for potential Python packages
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 # RUN pip install poetry
 
 # Copy the current directory contents into the container at /code
-COPY . /code/
+COPY . .
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
